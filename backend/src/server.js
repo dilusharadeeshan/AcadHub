@@ -1,15 +1,20 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 
+//test route
 app.get('/', (req, res) => {
  res.send("AcadHub API is running");
 });
 
 
-
+//register route with validation
 app.post("/api/auth/register", (req, res) => {
   const { name, email, password } = req.body;
 
@@ -46,6 +51,19 @@ app.post("/api/auth/register", (req, res) => {
   });
 });
 
+//connect to MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((error) => {
+    console.log("MongoDB connection failed");
+    console.log(error.message);
+  });
+
+
+//start the server  
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
