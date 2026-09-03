@@ -1,5 +1,7 @@
+import Student from "../models/Student.js";
+
 //register route with validation
-export const registerStudent =  (req, res) => {
+export const registerStudent = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -25,6 +27,14 @@ export const registerStudent =  (req, res) => {
       message: "Password must be at least 8 characters long"
     });
   }
+
+  const existingStudent = await Student.findOne({ email });
+
+if (existingStudent) {
+  return res.status(409).json({
+    message: "Email is already registered"
+  });
+}
 
   res.status(201).json({
     message: "Register request received",
