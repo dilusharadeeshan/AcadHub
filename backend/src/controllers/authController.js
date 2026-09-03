@@ -1,4 +1,5 @@
 import Student from "../models/Student.js";
+import bcrypt from "bcrypt";
 
 //register route with validation
 export const registerStudent = async (req, res) => {
@@ -35,6 +36,10 @@ if (existingStudent) {
     message: "Email is already registered"
   });
 }
+
+const hashedPassword = await bcrypt.hash(password, 10);
+
+console.log(hashedPassword);
 
   res.status(201).json({
     message: "Register request received",
