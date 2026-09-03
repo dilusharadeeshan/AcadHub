@@ -1,5 +1,8 @@
+import Student from "../models/Student.js";
+import bcrypt from "bcrypt";
+
 //register route with validation
-export const registerStudent =  (req, res) => {
+export const registerStudent = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -26,11 +29,28 @@ export const registerStudent =  (req, res) => {
     });
   }
 
-  res.status(201).json({
-    message: "Register request received",
-    user: {
-      name,
-      email
-    }
+  const existingStudent = await Student.findOne({ email });
+
+if (existingStudent) {
+  return res.status(409).json({
+    message: "Email is already registered"
   });
+}
+
+const hashedPassword = await bcrypt.hash(password, 10);
+
+const student = await Student.create({
+  name,
+  email,
+  password: hashedPassword
+});
+
+ return res.status(201).json({
+  message: "Student registered successfully",
+  user: {
+    id: student._id,
+    name: student.name,
+    email: student.email
+  }
+});
 };
