@@ -39,13 +39,18 @@ if (existingStudent) {
 
 const hashedPassword = await bcrypt.hash(password, 10);
 
-console.log(hashedPassword);
+const student = await Student.create({
+  name,
+  email,
+  password: hashedPassword
+});
 
-  res.status(201).json({
-    message: "Register request received",
-    user: {
-      name,
-      email
-    }
-  });
+ return res.status(201).json({
+  message: "Student registered successfully",
+  user: {
+    id: student._id,
+    name: student.name,
+    email: student.email
+  }
+});
 };
