@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 //register route with validation
 export const registerStudent = async (req, res) => {
   const { name, email, password } = req.body;
-
+  try {
   if (!name || !email || !password) {
     return res.status(400).json({
       message: "Name, email and password are required"
@@ -44,7 +44,7 @@ const student = await Student.create({
   email,
   password: hashedPassword
 });
-
+} catch (error) {
  return res.status(201).json({
   message: "Student registered successfully",
   user: {
@@ -53,4 +53,5 @@ const student = await Student.create({
     email: student.email
   }
 });
+}
 };
