@@ -1,5 +1,6 @@
 import Student from "../models/Student.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 //register route with validation
 export const registerStudent = async (req, res) => {
@@ -82,9 +83,20 @@ export const loginStudent = async (req, res) => {
         message: "Invalid email or password"
       });
     }
+    const token = jwt.sign(
+  { studentId: student._id },
+  process.env.JWT_SECRET,
+  { expiresIn: "1d" }
+);
 
+res.cookie("token", token, {
+  httpOnly: true,
+  sameSite: "lax",
+  maxAge: 24 * 60 * 60 * 1000
+});
     return res.status(200).json({
       message: "Login successful",
+      
       user: {
         id: student._id,
         name: student.name,
