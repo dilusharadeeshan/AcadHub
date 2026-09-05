@@ -110,3 +110,39 @@ res.cookie("token", token, {
     });
   }
 };
+
+export const getProfile = async (req, res) => {
+  try {
+    const student = await Student.findById(req.studentId);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found"
+      });
+    }
+
+    return res.status(200).json({
+      user: {
+        id: student._id,
+        name: student.name,
+        email: student.email
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong"
+    });
+  }
+};
+
+//remove the token from the cookie to log out the user
+export const logoutStudent = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax"
+  });
+
+  return res.status(200).json({
+    message: "Logout successful"
+  });
+};
