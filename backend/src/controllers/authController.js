@@ -45,8 +45,8 @@ const student = await Student.create({
   email,
   password: hashedPassword
 });
-} catch (error) {
- return res.status(201).json({
+
+return res.status(201).json({
   message: "Student registered successfully",
   user: {
     id: student._id,
@@ -54,6 +54,11 @@ const student = await Student.create({
     email: student.email
   }
 });
+
+} catch (error) {
+   return res.status(500).json({
+      message: "Something went wrong"
+    });
 }
 };
 
