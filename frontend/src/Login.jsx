@@ -11,7 +11,6 @@ export default function Login() {
   };
 
   return (
-    // මුළු screen එක පුරාම පැතිරෙන Full-Screen Background Image Container එක
     <div 
       className="min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative font-sans"
       style={{
@@ -20,7 +19,7 @@ export default function Login() {
 
 
     >
-      {/* Background Dark Overlay (Image එක උඩින් අඳුරු තට්ටුවක් දමා Login Card එක පැහැදිලිව පෙන්වීමට) */}
+      {/* Background Dark Overlay  */}
       <div className="absolute inset-0 bg-[#060814]/80 backdrop-blur-[2px]"></div>
 
       {/* ===================== CENTER LOGIN CARD ===================== */}
