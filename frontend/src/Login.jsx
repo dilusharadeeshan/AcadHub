@@ -8,22 +8,42 @@ const Login = () => {
   const [error, setError] = useState('');
 
   // Function executed when the form is submitted
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Basic validation to check for empty fields
-    if (!email || !password) {
-      setError('Please enter both email and password.');
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!email || !password) {
+    setError('Please enter both email and password.');
+    return;
+  }
+
+  setError('');
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message);
       return;
     }
 
-    setError('');
-    
-    // This is where you will connect your Backend API later
-    console.log('Logging in with:', { email, password });
-    alert('Login successful! (Ready to send data to backend)');
-  };
+    alert(data.message);
 
+  } catch (error) {
+    setError('Something went wrong. Please try again.');
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
