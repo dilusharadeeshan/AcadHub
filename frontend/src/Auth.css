@@ -1,0 +1,375 @@
+/* =========================
+   Authentication Layout
+========================= */
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  color: #1f2937;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* =========================
+   Form Card
+========================= */
+
+.auth-form {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 38px;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================
+   Heading
+========================= */
+
+.auth-heading {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-logo {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+  background: #2563eb;
+  color: white;
+
+  text-decoration: none;
+}
+
+.brand-word {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #111827;
+}
+
+.brand-word span {
+  color: #2563eb;
+}
+
+.auth-heading p {
+  margin: 7px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.auth-heading h2 {
+  margin: 22px 0 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+/* =========================
+   Form
+========================= */
+
+.auth-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* =========================
+   Fields
+========================= */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.field input::placeholder {
+  color: #9ca3af;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* =========================
+   Password
+========================= */
+
+.password-field {
+  position: relative;
+}
+
+.password-field .field input {
+  padding-right: 70px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+
+  border: none;
+  background: transparent;
+
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: #1d4ed8;
+}
+
+/* =========================
+   Form Options
+========================= */
+
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  font-size: 13px;
+  color: #6b7280;
+
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  margin-top: 2px;
+  accent-color: #2563eb;
+}
+
+/* =========================
+   Button
+========================= */
+
+.full-width {
+  width: 100%;
+}
+
+.auth-form button[type="submit"] {
+  min-height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+  background: #1d4ed8;
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.22);
+}
+
+.auth-form button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+.auth-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   Error Message
+========================= */
+
+.notice {
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.notice.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+.form-error {
+  padding: 11px 13px;
+  margin-bottom: 4px;
+
+  border-radius: 9px;
+
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+
+  color: #dc2626;
+
+  font-size: 14px;
+}
+
+/* =========================
+   Password Recovery
+========================= */
+
+.auth-recovery {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.auth-recovery summary {
+  cursor: pointer;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.auth-recovery p {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+/* =========================
+   Bottom Link
+========================= */
+
+.auth-switch {
+  margin: 24px 0 0;
+
+  text-align: center;
+
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.auth-switch a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Footer
+========================= */
+
+.auth-copyright {
+  padding: 18px;
+
+  text-align: center;
+
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* =========================
+   Form Grid
+========================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+  .auth-main {
+    padding: 25px 15px;
+    align-items: flex-start;
+  }
+
+  .auth-form {
+    padding: 28px 22px;
+    border-radius: 15px;
+  }
+
+  .brand-word {
+    font-size: 27px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-copyright {
+    padding: 15px;
+  }
+}
