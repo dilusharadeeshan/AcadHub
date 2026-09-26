@@ -1,0 +1,27 @@
+{
+  "name": "acadhub",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix frontend",
+    "lint": "npm run lint --prefix frontend && node scripts/check-backend.mjs",
+    "test": "npm test --prefix backend && npm test --prefix frontend",
+    "test:e2e": "playwright test",
+    "start": "npm start --prefix backend",
+    "seed": "npm run seed --prefix backend",
+    "setup": "node scripts/setup.mjs",
+    "preview:demo": "node backend/tests/dev-server.js",
+    "format": "prettier --write backend/src backend/tests frontend/src frontend/index.html frontend/vite.config.js frontend/eslint.config.js e2e scripts playwright.config.js package.json compose.yaml render.yaml deploy/vercel.example.json .github/workflows/ci.yml",
+    "format:check": "prettier --check backend/src backend/tests frontend/src frontend/index.html frontend/vite.config.js frontend/eslint.config.js e2e scripts playwright.config.js package.json compose.yaml render.yaml deploy/vercel.example.json .github/workflows/ci.yml"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "concurrently": "^10.0.5",
+    "prettier": "^3.9.7"
+  }
+}

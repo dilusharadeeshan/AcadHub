@@ -1,51 +1,50 @@
-import dns from "dns";
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-
-import express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import cookieParser from "cookie-parser";
-import cors from "cors";
-
-import authRoutes from "./routes/authRoutes.js";
-
-dotenv.config();
-
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true
-  })
-);
-
-//test route
-app.get('/', (req, res) => {
- res.send("AcadHub API is running");
-});
-
-
-app.use("/api/auth", authRoutes);
-
-//connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((error) => {
-    console.log("MongoDB connection failed");
-    console.log(error.message);
+import { drainFileRemovals } from './services/cleanup.js';
+import { Guard } from './models/index.js';
+import { config, validateConfig } from './config/env.js';
+import { createApp } from './app.js';
+let server, cleanupTimer;
+try {
+  validateConfig();
+} catch (error) {
+  console.error('Configuration error: ' + error.message);
+  process.exit(1);
+}
+try {
+  // Request schemas and rejectOperators allow only safe, typed filters.
+  await mongoose.connect(config.mongoUri, {
+    serverSelectionTimeoutMS: 10000,
+    autoIndex: config.env !== 'production',
   });
-
-
-//start the server  
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
-
+  await Guard.updateOne(
+    { _id: 'admin-access' },
+    { $setOnInsert: { version: 0 } },
+    { upsert: true },
+  );
+  cleanupTimer = setInterval(
+    () => void drainFileRemovals().catch(() => console.error('File cleanup is unavailable.')),
+    60000,
+  );
+  cleanupTimer.unref();
+  server = createApp().listen(config.port, () =>
+    console.log('AcadHub listening on port ' + config.port),
+  );
+} catch (error) {
+  console.error(
+    'Startup failed (' +
+      error.name +
+      '). Verify database connectivity and required environment configuration.',
+  );
+  process.exitCode = 1;
+  await mongoose.disconnect();
+}
+async function shutdown() {
+  clearInterval(cleanupTimer);
+  const timer = setTimeout(() => process.exit(1), 10000);
+  timer.unref();
+  if (server) await new Promise((resolve) => server.close(resolve));
+  await mongoose.disconnect();
+  clearTimeout(timer);
+}
+process.once('SIGTERM', shutdown);
+process.once('SIGINT', shutdown);

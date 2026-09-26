@@ -1,3 +1,14 @@
 node_modules/
 .env
-sources
+.env.*
+!.env.example
+sources/
+dist/
+coverage/
+var/
+tmp/
+artifacts/
+test-results/
+playwright-report/
+*.log
+.DS_Store
