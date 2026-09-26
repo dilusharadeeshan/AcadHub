@@ -1,100 +1,164 @@
-import { useState } from 'react';
-
+import { useState } from "react";
+import { GraduationCap, ArrowRight } from "lucide-react";
+import "./Auth.css";
 
 const Login = () => {
-  // States for Email, Password, and Error Messages
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  // Function executed when the form is submitted
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Basic validation to check for empty fields
+
     if (!email || !password) {
-      setError('Please enter both email and password.');
+      setError("Please enter both email and password.");
       return;
     }
 
-    setError('');
-    
-    // This is where you will connect your Backend API later
-    console.log('Logging in with:', { email, password });
-    alert('Login successful! (Ready to send data to backend)');
+    setError("");
+    setBusy(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed.");
+        return;
+      }
+
+      alert(data.message);
+    } catch (error) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        
-        {/* Heading */}
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-800">Welcome Back!</h2>
-          <p className="text-sm text-gray-500 mt-2">Log in to your account to continue learning</p>
-        </div>
-
-        {/* Error Message Alert */}
-        {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center border border-red-200">
-            {error}
-          </div>
-        )}
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="auth-layout">
+      <main className="auth-main">
+        <div className="auth-form">
           
-          {/* Email Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="example@mail.com"
-            />
-          </div>
+          {/* Header */}
+          <header className="auth-heading">
+            <div className="auth-logo" aria-label="AcadHub">
+              <GraduationCap size={27} />
+            </div>
 
-          {/* Password Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="••••••••"
-            />
-          </div>
+            <h1 className="brand-word">
+              Acad<span>Hub</span>
+            </h1>
 
-          {/* Remember Me & Forgot Password Links */}
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center text-gray-600">
-              <input type="checkbox" className="rounded text-blue-500 mr-2" />
-              Remember me
-            </label>
-            <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
-          </div>
+            <p>Centralized Academic Collaboration Workspace</p>
+          </header>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
-          >
-            Log In
-          </button>
-        </form>
+          {/* Login form */}
+          <form onSubmit={handleSubmit}>
+            
+            {error && (
+              <div className="form-error">
+                {error}
+              </div>
+            )}
 
-        {/* Register/Sign Up Link */}
-        <div className="text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <a href="#" className="text-blue-600 font-medium hover:underline">
-            Register here
-          </a>
+            {/* Email */}
+            <div className="field">
+              <label htmlFor="email">
+                Email address
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="name@university.ac.lk"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Password */}
+            <div className="password-field">
+              <div className="field">
+                <label htmlFor="password">
+                  Password
+                </label>
+
+                <input
+                  id="password"
+                  name="password"
+                  type={visible ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setVisible(!visible)}
+              >
+                {visible ? "Hide" : "Show"}
+              </button>
+            </div>
+
+            {/* Remember me */}
+            <div className="form-options">
+              <label className="checkbox-label">
+                <input type="checkbox" />
+                <span>Keep me signed in</span>
+              </label>
+            </div>
+
+            {/* Login button */}
+            <button
+              type="submit"
+              className="full-width"
+              disabled={busy}
+            >
+              {busy ? "Signing in..." : "Sign in"}
+              
+              {!busy && <ArrowRight size={17} />}
+            </button>
+          </form>
+
+          {/* Register */}
+          <p className="auth-switch">
+            Don't have an account yet?{" "}
+            <a href="#">
+              Create an account
+            </a>
+          </p>
+
         </div>
+      </main>
 
-      </div>
+      {/* Footer */}
+      <footer className="auth-copyright">
+        © {new Date().getFullYear()} AcadHub · Academic Management System
+      </footer>
     </div>
   );
 };
