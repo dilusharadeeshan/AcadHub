@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -43,7 +46,8 @@ const Login = () => {
         return;
       }
 
-      alert(data.message);
+      navigate("/dashboard");
+
     } catch (error) {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -59,7 +63,7 @@ const Login = () => {
           {/* Header */}
           <header className="auth-heading">
             <div className="auth-logo" aria-label="AcadHub">
-              <GraduationCap size={27} />
+              <GraduationCap size={24} />
             </div>
 
             <h1 className="brand-word">
@@ -81,7 +85,7 @@ const Login = () => {
             {/* Email */}
             <div className="field">
               <label htmlFor="email">
-                Email address
+                EMAIL ADDRESS *
               </label>
 
               <input
@@ -97,70 +101,75 @@ const Login = () => {
             </div>
 
             {/* Password */}
-            <div className="password-field">
-              <div className="field">
+            <div className="field">
+              <div className="field-header">
                 <label htmlFor="password">
-                  Password
+                  PASSWORD *
                 </label>
+                <a href="#" className="forgot-password">
+                  Lost password?
+                </a>
+              </div>
 
+              <div className="password-field">
                 <input
                   id="password"
                   name="password"
                   type={visible ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="Enter your password"
+                  placeholder=""
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-              </div>
 
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setVisible(!visible)}
-              >
-                {visible ? "Hide" : "Show"}
-              </button>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setVisible(!visible)}
+                >
+                  {visible ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             {/* Remember me */}
             <div className="form-options">
               <label className="checkbox-label">
                 <input type="checkbox" />
-                <span>Keep me signed in</span>
+                <span>Keep me signed in for 7 days</span>
               </label>
             </div>
 
             {/* Login button */}
             <button
               type="submit"
-              className="full-width"
+              className="full-width submit-btn"
               disabled={busy}
             >
-              {busy ? "Signing in..." : "Sign in"}
+              {busy ? "Signing in..." : "Sign In"}
               
               {!busy && <ArrowRight size={17} />}
             </button>
           </form>
 
           {/* Register */}
-          <p className="auth-switch">
+          <div className="auth-switch">
             Don't have an account yet?{" "}
             <a href="#">
               Create an account
             </a>
-          </p>
+          </div>
 
         </div>
       </main>
 
       {/* Footer */}
       <footer className="auth-copyright">
-        © {new Date().getFullYear()} AcadHub · Academic Management System
+        © 2026 AcadHub · Academic Management System
       </footer>
     </div>
   );
 };
 
-export default Login;
+export default Login;
