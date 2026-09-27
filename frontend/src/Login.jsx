@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
 
 const Login = () => {
+
+    const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,12 +42,13 @@ const Login = () => {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.message || "Login failed.");
-        return;
-      }
+     if (!response.ok) {
+  setError(data.message || "Login failed.");
+  return;
+}
 
-      alert(data.message);
+navigate("/dashboard");
+
     } catch (error) {
       setError("Something went wrong. Please try again.");
     } finally {
