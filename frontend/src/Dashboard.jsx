@@ -5,6 +5,24 @@ const Dashboard = () => {
 
     const navigate = useNavigate();
 
+    const handleLogout = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/logout",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    if (response.ok) {
+      navigate("/login");
+    }
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
 
@@ -55,6 +73,10 @@ const Dashboard = () => {
       <h2>Welcome, {user.name}!</h2>
 
       <p>Email: {user.email}</p>
+
+      <button onClick={handleLogout}>
+  Logout
+</button>
     </div>
   );
 };
