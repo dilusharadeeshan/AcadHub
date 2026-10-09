@@ -21,7 +21,7 @@ const noticeSchema = new mongoose.Schema(
 },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Student', // link with user collection
+      ref: 'User',
       required: true,
     },
   },

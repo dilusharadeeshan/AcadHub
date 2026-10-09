@@ -47,7 +47,7 @@ export const createNotice = async (req, res) => {
       title: title.trim(),
       content: content.trim(),
       category: normalizedCategory,
-      createdBy: req.studentId,
+      createdBy: req.userId || req.studentId,
     });
 
     return res.status(201).json({
