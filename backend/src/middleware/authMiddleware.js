@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export const protect = (req, res, next) => {
+export const protect =async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
@@ -12,7 +12,16 @@ export const protect = (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.studentId = decoded.studentId;
+    const student = await Student.findById(decoded.studentId).select("_id role");
+
+    if (!student) {
+      return res.status(401).json({
+        message: "Student account not found",
+      });
+    }
+
+     req.studentId = student._id.toString();
+    req.userRole = student.role || "student";
 
     next();
   } catch (error) {
