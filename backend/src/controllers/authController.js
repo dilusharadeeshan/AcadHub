@@ -51,7 +51,8 @@ return res.status(201).json({
   user: {
     id: student._id,
     name: student.name,
-    email: student.email
+    email: student.email,
+    role: student.role
   }
 });
 
@@ -105,7 +106,8 @@ res.cookie("token", token, {
       user: {
         id: student._id,
         name: student.name,
-        email: student.email
+        email: student.email,
+        role: student.role
       }
     });
 
@@ -130,7 +132,8 @@ export const getProfile = async (req, res) => {
       user: {
         id: student._id,
         name: student.name,
-        email: student.email
+        email: student.email,
+        role: student.role
       }
     });
   } catch (error) {

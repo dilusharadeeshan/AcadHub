@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+import Student from "../models/Student.js";
+
 export const protect =async (req, res, next) => {
   try {
     const token = req.cookies.token;
