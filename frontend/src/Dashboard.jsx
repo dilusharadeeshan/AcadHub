@@ -73,10 +73,20 @@ const Dashboard = () => {
       <h2>Welcome, {user.name}!</h2>
 
       <p>Email: {user.email}</p>
+      <p>Role: <strong>{user.role || "student"}</strong></p>
 
-      <button onClick={handleLogout}>
-  Logout
-</button>
+      {user.role === "admin" && (
+        <div style={{ marginTop: "1rem", padding: "1rem", border: "1px solid #ccc", borderRadius: "8px" }}>
+          <h3>Admin Controls</h3>
+          <p>You have administrative access.</p>
+        </div>
+      )}
+
+      <div style={{ marginTop: "1.5rem" }}>
+        <button onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
     </div>
   );
 };

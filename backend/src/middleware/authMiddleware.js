@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import Student from "../models/Student.js";
 
-export const protect =async (req, res, next) => {
+export const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
@@ -22,11 +22,13 @@ export const protect =async (req, res, next) => {
       });
     }
 
-     req.studentId = student._id.toString();
+    req.user = student;
+    req.studentId = student._id.toString();
     req.userRole = student.role || "student";
 
     next();
   } catch (error) {
+    console.error("Auth Middleware Error:", error.message);
     return res.status(401).json({
       message: "Invalid or expired authentication"
     });
