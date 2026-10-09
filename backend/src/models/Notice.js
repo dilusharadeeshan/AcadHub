@@ -12,14 +12,21 @@ const noticeSchema = new mongoose.Schema(
       required: [true, 'Please provide notice content'],
       trim: true,
     },
+    category: {
+  type: String,
+  required: [true, 'Please select a notice category'],
+  enum: ['general', 'ca','exam', 'academic', 'event'],
+  lowercase: true,
+  trim: true,
+},
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // User collection එකත් එක්ක link කිරීම
+      ref: 'Student', // link with user collection
       required: true,
     },
   },
   {
-    timestamps: true, // මේකෙන් createdAt සහ updatedAt auto generate වෙනවා
+    timestamps: true,
   }
 );
 
