@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ const Login = () => {
 
       navigate("/dashboard");
 
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setBusy(false);
@@ -156,9 +158,9 @@ const Login = () => {
           {/* Register */}
           <div className="auth-switch">
             Don't have an account yet?{" "}
-            <a href="#">
+            <Link to="/register" className="auth-link">
               Create an account
-            </a>
+            </Link>
           </div>
 
         </div>
@@ -172,4 +174,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login;

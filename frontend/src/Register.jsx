@@ -45,7 +45,7 @@ const Register = () => {
     }
 
     navigate("/login");
-  } catch (error) {
+  } catch {
    setError("Something went wrong. Please try again.");
   }
 
