@@ -48,7 +48,7 @@ const Login = () => {
 
       navigate("/dashboard");
 
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setBusy(false);

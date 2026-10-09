@@ -50,13 +50,13 @@ const Dashboard = () => {
 }
 
         setUser(data.user);
-      } catch (error) {
+      } catch {
         setError("Something went wrong. Please try again.");
       }
     };
 
     getProfile();
-  }, []);
+  }, [navigate]);
 
   if (error) {
     return <p>{error}</p>;
