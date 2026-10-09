@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
+import noticeRoutes from "./routes/noticeRoutes.js";
 
 dotenv.config();
 
@@ -49,3 +50,6 @@ app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
 
+
+//notice routes
+app.use("/api/notices", noticeRoutes);
