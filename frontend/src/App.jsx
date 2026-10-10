@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { ProtectedRoute } from "./routes/ProtectedRoute";import Home from "./pages/home/Home";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
+import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
+import AllNotices from "./pages/notices/AllNotices";
 
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
             }
           />
         <Route path="/register" element={<Register />} />
+        <Route path="/notices" element={<AllNotices />} />
       </Routes>
     </BrowserRouter>
         </AuthProvider>
