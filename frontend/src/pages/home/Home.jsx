@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   GraduationCap,
@@ -85,59 +85,63 @@ const PORTAL_CARDS = [
   },
 ];
 
-const INITIAL_NOTICES = [
-  {
-    id: 1,
-    title: "End-Semester Examination Timetable - Fall 2026",
-    category: "Exam",
-    tagClass: "tag-exam",
-    date: "Today, 10:30 AM",
-    snippet: "The final examination schedule for the Faculty of Computing & Engineering is officially published.",
-  },
-  {
-    id: 2,
-    title: "Call for Undergraduate Research Abstracts",
-    category: "Academic",
-    tagClass: "tag-academic",
-    date: "Oct 04, 2026",
-    snippet: "Submit your final year project abstracts for the Annual AcadHub Research Symposium by Oct 25.",
-  },
-  {
-    id: 3,
-    title: "Campus Central Library 24-Hour Study Access",
-    category: "General",
-    tagClass: "tag-general",
-    date: "Oct 02, 2026",
-    snippet: "The central library and computer labs will remain open 24/7 throughout the upcoming study and exam weeks.",
-  },
-  {
-    id: 4,
-    title: "Elective Module Registration Deadline Extended",
-    category: "Academic",
-    tagClass: "tag-academic",
-    date: "Sep 29, 2026",
-    snippet: "Students who have not finalized their elective choices may make portal updates until Friday 5:00 PM.",
-  },
-  {
-    id: 5,
-    title: "Guest Seminar: Deep Learning in Modern Software",
-    category: "Event",
-    tagClass: "tag-event",
-    date: "Sep 25, 2026",
-    snippet: "Join visiting industry fellows at Auditorium Hall B for an interactive technical session.",
-  },
-];
-
 const Home = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState("All");
+ const [activeFilter, setActiveFilter] = useState("All");
+const [notices, setNotices] = useState([]);
+const [loadingNotices, setLoadingNotices] = useState(true);
+const [noticeError, setNoticeError] = useState("");
 
-  const filteredNotices =
-    activeFilter === "All"
-      ? INITIAL_NOTICES
-      : INITIAL_NOTICES.filter(
-          (notice) => notice.category.toLowerCase() === activeFilter.toLowerCase()
-        );
+useEffect(() => {
+  const fetchNotices = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/notices");
+
+      if (!response.ok) {
+        throw new Error("Failed to load notices");
+      }
+
+      const data = await response.json();
+      setNotices(data.notices || []);
+    } catch (error) {
+      setNoticeError("Unable to load notices. Please try again later.");
+    } finally {
+      setLoadingNotices(false);
+    }
+  };
+
+  fetchNotices();
+}, []);
+
+const filteredNotices =
+  activeFilter === "All"
+    ? notices
+    : notices.filter(
+        (notice) =>
+          notice.category.toLowerCase() === activeFilter.toLowerCase()
+      );
+
+const latestNotices = filteredNotices.slice(0, 5);
+
+const getNoticeTagClass = (category) => {
+  const classes = {
+    general: "tag-general",
+    ca: "tag-academic",
+    exam: "tag-exam",
+    academic: "tag-academic",
+    event: "tag-event",
+  };
+
+  return classes[category?.toLowerCase()] || "tag-general";
+};
+
+const formatNoticeDate = (date) => {
+  return new Date(date).toLocaleDateString("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
   return (
     <div className="home-layout">
@@ -256,13 +260,13 @@ const Home = () => {
                 <h3 className="notices-heading">Notices</h3>
               </div>
               <span className="notices-count-badge">
-                {INITIAL_NOTICES.length} New
+                {notices.length} Total
               </span>
             </header>
 
             {/* Filter tags */}
             <div className="notices-filter-bar">
-              {["All", "Exam", "Academic", "Event"].map((filter) => (
+            {["All", "General", "CA", "Exam", "Academic", "Event"].map((filter) => (
                 <button
                   key={filter}
                   type="button"
@@ -274,37 +278,43 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Notices item list */}
+            {/* Notices List */}
             <div className="notices-list">
-              {filteredNotices.map((notice) => (
-                <article
-                  key={notice.id}
-                  className="notice-item"
-                  onClick={() => navigate("/login")}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="notice-top-meta">
-                    <span className={`notice-tag ${notice.tagClass}`}>
-                      {notice.category}
-                    </span>
-                    <span className="notice-date">
-                      <Clock size={12} />
-                      {notice.date}
-                    </span>
-                  </div>
+  {loadingNotices ? (
+    <p>Loading notices...</p>
+  ) : noticeError ? (
+    <p>{noticeError}</p>
+  ) : latestNotices.length === 0 ? (
+    <p>No notices available in this category.</p>
+  ) : (
+    latestNotices.map((notice) => (
+      <article key={notice._id} className="notice-item">
+        <div className="notice-top-meta">
+          <span
+            className={`notice-tag ${getNoticeTagClass(notice.category)}`}
+          >
+            {notice.category.toUpperCase()}
+          </span>
 
-                  <h4 className="notice-item-title">{notice.title}</h4>
-                  <p className="notice-item-snippet">{notice.snippet}</p>
-                </article>
-              ))}
-            </div>
+          <span className="notice-date">
+            <Clock size={12} />
+            {formatNoticeDate(notice.createdAt)}
+          </span>
+        </div>
+
+        <h4 className="notice-item-title">{notice.title}</h4>
+
+        <p className="notice-item-snippet">{notice.content}</p>
+      </article>
+    ))
+  )}
+</div>
 
             <footer className="notices-footer">
               <button
                 type="button"
                 className="view-all-notices-btn"
-                onClick={() => navigate("/login")}
+               onClick={() => navigate("/notices")}
               >
                 View all announcements
                 <ExternalLink size={13} />
