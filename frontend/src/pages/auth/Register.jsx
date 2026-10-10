@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
+import { authService } from "../../services/authService";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -21,33 +22,12 @@ const Register = () => {
     }
       setError("");
 
-    try {
-    const response = await fetch(
-      "http://localhost:5000/api/auth/register",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.message || "Registration failed.");
-      return;
-    }
-
-    navigate("/login");
-  } catch {
-   setError("Something went wrong. Please try again.");
-  }
+   try {
+  await authService.register(name, email, password);
+  navigate("/login");
+} catch (err) {
+  setError(err.message || "Registration failed.");
+}
 
   };
 
