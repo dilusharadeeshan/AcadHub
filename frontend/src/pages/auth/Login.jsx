@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
-import { authService } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
@@ -28,8 +27,12 @@ const Login = () => {
     setBusy(true);
 
    try {
-  await login(email, password); 
-  navigate("/dashboard");
+  const data = await login(email, password);
+ if (data.user?.role === "admin") {
+    navigate("/dashboard");
+  } else {
+    navigate("/");
+  }
 } catch (err) {
   setError(err.message || "Login failed.");
 } finally {
