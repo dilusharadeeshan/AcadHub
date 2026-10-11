@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
 import { useAuth } from "../../context/AuthContext";
+import { getDashboardPath } from "../../routes/ProtectedRoute";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,11 +29,7 @@ const Login = () => {
 
    try {
   const data = await login(email, password);
- if (data.user?.role === "admin") {
-    navigate("/dashboard");
-  } else {
-    navigate("/");
-  }
+  navigate(getDashboardPath(data.user?.role));
 } catch (err) {
   setError(err.message || "Login failed.");
 } finally {
