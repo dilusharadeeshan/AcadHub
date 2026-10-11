@@ -27,8 +27,12 @@ const Login = () => {
     setBusy(true);
 
    try {
-  await login(email, password); 
-  navigate("/dashboard");
+  const data = await login(email, password);
+ if (data.user?.role === "admin") {
+    navigate("/dashboard");
+  } else {
+    navigate("/");
+  }
 } catch (err) {
   setError(err.message || "Login failed.");
 } finally {
