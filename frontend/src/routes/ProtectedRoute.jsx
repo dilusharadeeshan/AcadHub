@@ -2,6 +2,10 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+
+export const getDashboardPath = (role) =>
+  role === "admin" ? "/admin-dashboard" : "/user-dashboard";
+
 export const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
@@ -15,9 +19,8 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // 3. Logged in, but does not have the required role (e.g. student accessing admin page)
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+ if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={getDashboardPath(user.role)} replace />;
   }
 
   // 4. Authorized -> Render the protected component

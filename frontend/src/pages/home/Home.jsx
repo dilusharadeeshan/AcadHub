@@ -210,14 +210,18 @@ const formatNoticeDate = (date) => {
             {user.role === "admin" ? "Administrator" : "Student"}
           </p>
 
-          {user.role === "admin" && (
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard")}
-            >
-              Dashboard
-            </button>
-          )}
+          <button
+  type="button"
+  onClick={() => {
+    if (user.role === "admin") {
+      navigate("/admin-dashboard");
+    } else {
+      navigate("/user-dashboard");
+    }
+  }}
+>
+  Dashboard
+</button>
 
           <button
             type="button"

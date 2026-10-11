@@ -1,6 +1,21 @@
 // Read from .env file, or fallback to localhost
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
+// Raw fetch wrapper — returns the Response object so callers can check .ok and call .json() themselves
+export const apiFetch = (endpoint, options = {}) => {
+  const config = {
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    credentials: "include",
+    ...options,
+  };
+
+  return fetch(`${BASE_URL}${endpoint}`, config);
+};
+
 export const request = async (endpoint, options = {}) => {
   const config = {
     method: options.method || "GET",
