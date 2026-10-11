@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import "./Auth.css";
-import { authService } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
