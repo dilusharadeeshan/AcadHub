@@ -14,9 +14,12 @@ import {
   Clock,
   Sparkles,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  UserCircle,
+  LogOut
 } from "lucide-react";
 import "./Home.css";
+import { useAuth } from "../../context/AuthContext";
 
 const PORTAL_CARDS = [
   {
@@ -87,6 +90,10 @@ const PORTAL_CARDS = [
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const { user, logout } = useAuth();
+const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+
  const [activeFilter, setActiveFilter] = useState("All");
 const [notices, setNotices] = useState([]);
 const [loadingNotices, setLoadingNotices] = useState(true);
@@ -162,23 +169,77 @@ const formatNoticeDate = (date) => {
         </div>
 
         {/* Top-right Login & Register buttons as per sketch */}
-        <div className="navbar-actions">
+        
+<div className="navbar-actions">
+  {!user ? (
+    <>
+      <button
+        type="button"
+        className="nav-btn nav-btn-login"
+        onClick={() => navigate("/login")}
+      >
+        Login
+      </button>
+
+      <button
+        type="button"
+        className="nav-btn nav-btn-register"
+        onClick={() => navigate("/register")}
+      >
+        Register
+        <ArrowRight size={15} />
+      </button>
+    </>
+  ) : (
+    <div className="profile-menu-container">
+      <button
+        type="button"
+        className="profile-icon-btn"
+        aria-label="Open profile menu"
+        aria-expanded={profileMenuOpen}
+        onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+      >
+        <UserCircle size={27} />
+        <span>{user.name}</span>
+      </button>
+
+      {profileMenuOpen && (
+        <div className="profile-dropdown">
+          <p className="profile-user-name">{user.name}</p>
+          <p className="profile-user-role">
+            {user.role === "admin" ? "Administrator" : "Student"}
+          </p>
+
+          {user.role === "admin" && (
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+            >
+              Dashboard
+            </button>
+          )}
+
           <button
             type="button"
-            className="nav-btn nav-btn-login"
-            onClick={() => navigate("/login")}
+            onClick={async () => {
+              try {
+                await logout();
+                setProfileMenuOpen(false);
+                navigate("/");
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            }}
           >
-            Login
-          </button>
-          <button
-            type="button"
-            className="nav-btn nav-btn-register"
-            onClick={() => navigate("/register")}
-          >
-            Register
-            <ArrowRight size={15} />
+            <LogOut size={16} />
+            Logout
           </button>
         </div>
+      )}
+    </div>
+  )}
+</div>
+
       </nav>
 
       {/* Main Content Area */}

@@ -19,6 +19,70 @@
    Navbar / Top Header
    ========================= */
 
+   
+.profile-menu-container {
+  position: relative;
+}
+
+.profile-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  background: white;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.profile-icon-btn:hover {
+  background: #f1f5f9;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 100;
+  min-width: 190px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.profile-user-name {
+  margin: 4px 8px;
+  font-weight: 600;
+}
+
+.profile-user-role {
+  margin: 4px 8px 12px;
+  color: #64748b;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.profile-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #334155;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-dropdown button:hover {
+  background: #f1f5f9;
+}
+
 .home-navbar {
   display: flex;
   align-items: center;
