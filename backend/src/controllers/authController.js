@@ -157,6 +157,106 @@ export const logoutUser = (req, res) => {
   });
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.userId || req.studentId;
+    const { name, email } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name !== undefined) {
+      if (!name || name.trim().length < 2) {
+        return res.status(400).json({ message: "Name must be at least 2 characters long" });
+      }
+      user.name = name.trim();
+    }
+
+    if (email !== undefined) {
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({ message: "Please enter a valid email address" });
+      }
+      const lowerEmail = email.toLowerCase().trim();
+      const existing = await User.findOne({ email: lowerEmail, _id: { $ne: userId } });
+      if (existing) {
+        return res.status(409).json({ message: "Email is already registered" });
+      }
+      user.email = lowerEmail;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("updateProfile error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.userId || req.studentId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new password are required" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: "New password must be at least 8 characters long" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("changePassword error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.userId || req.studentId;
+
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
+    return res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("deleteAccount error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 // Backward-compatible aliases
 export const registerStudent = registerUser;
 export const loginStudent = loginUser;

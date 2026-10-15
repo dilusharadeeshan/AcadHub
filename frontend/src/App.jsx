@@ -5,7 +5,7 @@ import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
-import StudentDashboard from "./pages/dashboard/Dashboard";
+import StudentDashboard from "./pages/dashboard/StudentDashboard";
 import AllNotices from "./pages/notices/AllNotices";
 
 
