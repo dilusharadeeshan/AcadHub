@@ -10,6 +10,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 import noticeRoutes from "./routes/noticeRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -32,6 +33,8 @@ app.get('/', (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/notices", noticeRoutes);
+app.use("/api/admin", adminRoutes);
 
 //connect to MongoDB
 mongoose
@@ -49,7 +52,3 @@ mongoose
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
-
-
-//notice routes
-app.use("/api/notices", noticeRoutes);
