@@ -16,7 +16,9 @@ import {
   ChevronRight,
   ExternalLink,
   UserCircle,
-  LogOut
+  LogOut,
+  Tag,
+  Hash
 } from "lucide-react";
 import "./Home.css";
 import { useAuth } from "../../context/AuthContext";
@@ -85,6 +87,57 @@ const PORTAL_CARDS = [
     icon: Award,
     badge: "Fall 2026",
     path: "/login",
+  },
+];
+
+const COURSES = [
+  {
+    id: 1,
+    shortName: "ENG2222",
+    name: "English IV",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 2,
+    shortName: "ICT2213",
+    name: "Operating System Concepts & Applications",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 3,
+    shortName: "ICT2223",
+    name: "Internet of Things",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 4,
+    shortName: "ICT2232",
+    name: "Software Engineering",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 5,
+    shortName: "ICT2242",
+    name: "Management Information Systems",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 6,
+    shortName: "ICT2252",
+    name: "Wireless Communications",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 7,
+    shortName: "TCS2212",
+    name: "Accounting for Technologists",
+    category: "2024/2025 Semester II",
+  },
+  {
+    id: 8,
+    shortName: "TMS2213_ICT",
+    name: "Probability and Statistics",
+    category: "2024/2025 Semester II",
   },
 ];
 
@@ -387,6 +440,50 @@ const formatNoticeDate = (date) => {
             </footer>
           </aside>
         </div>
+
+        {/* Course Catalog Section */}
+        <section className="course-catalog-section" aria-label="Course Catalog">
+          <div className="course-catalog-header">
+            <div className="course-catalog-title-group">
+              <div className="course-catalog-icon-badge">
+                <BookOpen size={18} />
+              </div>
+              <div>
+                <h3 className="course-catalog-heading">Course Catalog</h3>
+                <p className="course-catalog-subheading">2024/2025 Semester II — Enrolled Modules</p>
+              </div>
+            </div>
+            <span className="course-catalog-count-badge">{COURSES.length} Courses</span>
+          </div>
+
+          <div className="course-catalog-grid">
+            {COURSES.map((course) => (
+              <div
+                key={course.id}
+                className="course-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate("/login")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") navigate("/login");
+                }}
+              >
+                <div className="course-card-top">
+                  <span className="course-code-badge">
+                    <Hash size={11} />
+                    {course.shortName}
+                  </span>
+                  <ChevronRight size={16} className="course-card-arrow" />
+                </div>
+                <h4 className="course-card-name">{course.name}</h4>
+                <div className="course-card-footer">
+                  <Tag size={11} />
+                  <span>{course.category}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
