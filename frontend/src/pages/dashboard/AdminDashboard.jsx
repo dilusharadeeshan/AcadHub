@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   GraduationCap,
@@ -13,6 +13,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Shield,
+  Users,
+  UserPlus,
+  Pencil,
+  X,
+  UserCheck,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { apiFetch } from "../../services/api";
@@ -41,6 +46,7 @@ const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "notices", label: "Manage Notices", icon: Bell },
   { id: "create", label: "Create Notice", icon: PlusCircle },
+  { id: "users", label: "Manage Users", icon: Users },
 ];
 
 const formatDate = (date) =>
@@ -71,6 +77,20 @@ const AdminDashboard = () => {
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState({ type: "", text: "" });
+
+  // ── User management state ──────────────────────────────────────────────
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState("");
+  const [userSearch, setUserSearch] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+
+  // Modal: null | { mode: "create" | "edit", user?: {} }
+  const [userModal, setUserModal] = useState(null);
+  const [userForm, setUserForm] = useState({ name: "", email: "", password: "", role: "student" });
+  const [userFormMsg, setUserFormMsg] = useState({ type: "", text: "" });
+  const [userFormSaving, setUserFormSaving] = useState(false);
+  const modalRef = useRef(null);
 
   const fetchNotices = async () => {
     try {
@@ -167,6 +187,105 @@ const AdminDashboard = () => {
     }
   };
 
+  // ── User management handlers ───────────────────────────────────────────
+  const fetchUsers = async () => {
+    setUsersLoading(true);
+    setUsersError("");
+    try {
+      const res = await apiFetch("/admin/users");
+      if (!res.ok) throw new Error("Failed to load users");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch {
+      setUsersError("Unable to load users. Please try again.");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  // Fetch users when tab becomes active
+  useEffect(() => {
+    if (activeTab === "users") fetchUsers();
+  }, [activeTab]);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") setUserModal(null); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openCreateModal = () => {
+    setUserForm({ name: "", email: "", password: "", role: "student" });
+    setUserFormMsg({ type: "", text: "" });
+    setUserModal({ mode: "create" });
+    setTimeout(() => modalRef.current?.querySelector("input")?.focus(), 50);
+  };
+
+  const openEditModal = (u) => {
+    setUserForm({ name: u.name, email: u.email, password: "", role: u.role });
+    setUserFormMsg({ type: "", text: "" });
+    setUserModal({ mode: "edit", user: u });
+    setTimeout(() => modalRef.current?.querySelector("input")?.focus(), 50);
+  };
+
+  const closeUserModal = () => setUserModal(null);
+
+  const handleUserFormSave = async (e) => {
+    e.preventDefault();
+    setUserFormMsg({ type: "", text: "" });
+    setUserFormSaving(true);
+
+    try {
+      const isEdit = userModal.mode === "edit";
+      const payload = {
+        name: userForm.name,
+        email: userForm.email,
+        role: userForm.role,
+        ...(userForm.password ? { password: userForm.password } : {}),
+      };
+
+      const res = await apiFetch(
+        isEdit ? `/admin/users/${userModal.user._id}` : "/admin/users",
+        { method: isEdit ? "PUT" : "POST", body: JSON.stringify(payload) }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setUserFormMsg({ type: "error", text: data.message || "Operation failed." });
+        return;
+      }
+
+      if (isEdit) {
+        setUsers((prev) => prev.map((u) => (u._id === userModal.user._id ? { ...u, ...data.user } : u)));
+        setUserFormMsg({ type: "success", text: "User updated successfully." });
+      } else {
+        setUsers((prev) => [data.user, ...prev]);
+        setUserFormMsg({ type: "success", text: "User created successfully." });
+        setUserForm({ name: "", email: "", password: "", role: "student" });
+      }
+    } catch {
+      setUserFormMsg({ type: "error", text: "Could not connect to the server." });
+    } finally {
+      setUserFormSaving(false);
+    }
+  };
+
+  const handleDeleteUser = async (u) => {
+    if (!window.confirm(`Delete user "${u.name}"? This cannot be undone.`)) return;
+    try {
+      const res = await apiFetch(`/admin/users/${u._id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.message || "Failed to delete user.");
+        return;
+      }
+      setUsers((prev) => prev.filter((x) => x._id !== u._id));
+    } catch {
+      alert("Could not connect to the server.");
+    }
+  };
+
   // Stats
   const countsByCategory = useMemo(() => {
     const result = {};
@@ -200,10 +319,23 @@ const AdminDashboard = () => {
 
   const recentNotices = notices.slice(0, 5);
 
+  const filteredUsers = useMemo(() => {
+    const term = userSearch.trim().toLowerCase();
+    return users.filter((u) => {
+      const matchesRole = userRoleFilter === "all" || u.role === userRoleFilter;
+      const matchesSearch =
+        !term ||
+        u.name?.toLowerCase().includes(term) ||
+        u.email?.toLowerCase().includes(term);
+      return matchesRole && matchesSearch;
+    });
+  }, [users, userSearch, userRoleFilter]);
+
   const pageTitles = {
     overview: "Overview",
     notices: "Manage Notices",
     create: "Create Notice",
+    users: "Manage Users",
   };
 
   return (
@@ -565,8 +697,244 @@ const AdminDashboard = () => {
               </form>
             </div>
           )}
+
+          {/* ===== MANAGE USERS ===== */}
+          {activeTab === "users" && (
+            <div className="admin-panel">
+              {/* Toolbar */}
+              <div className="admin-toolbar">
+                <div className="admin-search">
+                  <Search size={15} />
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    aria-label="Search users"
+                  />
+                </div>
+
+                <select
+                  className="admin-select"
+                  value={userRoleFilter}
+                  onChange={(e) => setUserRoleFilter(e.target.value)}
+                  aria-label="Filter by role"
+                >
+                  <option value="all">All roles</option>
+                  <option value="student">Student</option>
+                  <option value="admin">Admin</option>
+                </select>
+
+                <button
+                  type="button"
+                  className="admin-primary-btn"
+                  onClick={openCreateModal}
+                >
+                  <UserPlus size={15} />
+                  Add user
+                </button>
+              </div>
+
+              {/* Table */}
+              {usersLoading ? (
+                <p className="admin-empty">Loading users...</p>
+              ) : usersError ? (
+                <p className="admin-empty admin-empty-error">{usersError}</p>
+              ) : filteredUsers.length === 0 ? (
+                <p className="admin-empty">No users match your filters.</p>
+              ) : (
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th aria-label="Actions" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredUsers.map((u) => (
+                        <tr key={u._id}>
+                          <td>
+                            <div className="um-user-cell">
+                              <div className="um-avatar">
+                                {(u.name || "U").charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="admin-cell-title">{u.name}</div>
+                                <div className="admin-cell-snippet">{u.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={`um-role-badge um-role-${u.role}`}>
+                              {u.role === "admin" ? <Shield size={11} /> : <UserCheck size={11} />}
+                              {u.role}
+                            </span>
+                          </td>
+                          <td className="admin-cell-date">{formatDate(u.createdAt)}</td>
+                          <td className="admin-cell-actions">
+                            <div className="um-action-group">
+                              <button
+                                type="button"
+                                className="admin-icon-btn"
+                                onClick={() => openEditModal(u)}
+                                aria-label={`Edit ${u.name}`}
+                                title="Edit"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                type="button"
+                                className="admin-icon-btn danger"
+                                onClick={() => handleDeleteUser(u)}
+                                aria-label={`Delete ${u.name}`}
+                                title="Delete"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Footer count */}
+              {!usersLoading && !usersError && (
+                <p className="um-count">
+                  Showing {filteredUsers.length} of {users.length} user{users.length !== 1 ? "s" : ""}
+                </p>
+              )}
+            </div>
+          )}
         </main>
       </div>
+
+      {/* ===== USER MODAL ===== */}
+      {userModal && (
+        <div
+          className="um-backdrop"
+          onClick={(e) => { if (e.target === e.currentTarget) closeUserModal(); }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={userModal.mode === "create" ? "Add new user" : "Edit user"}
+        >
+          <div className="um-modal" ref={modalRef}>
+            {/* Modal header */}
+            <div className="um-modal-header">
+              <h3>
+                {userModal.mode === "create" ? (
+                  <><UserPlus size={18} /> Add new user</>
+                ) : (
+                  <><Pencil size={18} /> Edit user</>
+                )}
+              </h3>
+              <button
+                type="button"
+                className="admin-icon-btn"
+                onClick={closeUserModal}
+                aria-label="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal form */}
+            <form onSubmit={handleUserFormSave} className="admin-form">
+              {userFormMsg.text && (
+                <div className={`admin-alert ${userFormMsg.type}`} role="alert">
+                  {userFormMsg.type === "success" ? (
+                    <CheckCircle2 size={16} />
+                  ) : (
+                    <AlertCircle size={16} />
+                  )}
+                  {userFormMsg.text}
+                </div>
+              )}
+
+              <div className="um-modal-fields">
+                <div className="admin-field">
+                  <label htmlFor="um-name">Full name</label>
+                  <input
+                    id="um-name"
+                    type="text"
+                    placeholder="e.g. Priya Sharma"
+                    value={userForm.name}
+                    onChange={(e) => setUserForm((f) => ({ ...f, name: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <div className="admin-field">
+                  <label htmlFor="um-email">Email address</label>
+                  <input
+                    id="um-email"
+                    type="email"
+                    placeholder="e.g. priya@college.edu"
+                    value={userForm.email}
+                    onChange={(e) => setUserForm((f) => ({ ...f, email: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <div className="admin-field">
+                  <label htmlFor="um-password">
+                    Password
+                    {userModal.mode === "edit" && (
+                      <span className="um-optional"> — leave blank to keep current</span>
+                    )}
+                  </label>
+                  <input
+                    id="um-password"
+                    type="password"
+                    placeholder={userModal.mode === "edit" ? "New password (optional)" : "Min 8 characters"}
+                    value={userForm.password}
+                    onChange={(e) => setUserForm((f) => ({ ...f, password: e.target.value }))}
+                    {...(userModal.mode === "create" ? { required: true, minLength: 8 } : {})}
+                  />
+                </div>
+
+                <div className="admin-field">
+                  <label htmlFor="um-role">Role</label>
+                  <select
+                    id="um-role"
+                    value={userForm.role}
+                    onChange={(e) => setUserForm((f) => ({ ...f, role: e.target.value }))}
+                  >
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="admin-form-actions">
+                <button
+                  type="button"
+                  className="admin-secondary-btn"
+                  onClick={closeUserModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="admin-primary-btn"
+                  disabled={userFormSaving}
+                >
+                  {userFormSaving
+                    ? "Saving..."
+                    : userModal.mode === "create"
+                    ? "Create user"
+                    : "Save changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

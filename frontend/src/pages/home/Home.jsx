@@ -94,10 +94,19 @@ const Home = () => {
   const { user, logout } = useAuth();
 const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
- const [activeFilter, setActiveFilter] = useState("All");
-const [notices, setNotices] = useState([]);
-const [loadingNotices, setLoadingNotices] = useState(true);
-const [noticeError, setNoticeError] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [notices, setNotices] = useState([]);
+  const [loadingNotices, setLoadingNotices] = useState(true);
+  const [noticeError, setNoticeError] = useState("");
+
+  const handleCardClick = (card) => {
+    if (card.id === "courses") {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+      window.location.href = `${apiBase}/courses`;
+      return;
+    }
+    navigate(card.path);
+  };
 
 useEffect(() => {
   const fetchNotices = async () => {
@@ -282,12 +291,12 @@ const formatNoticeDate = (date) => {
                   <div
                     key={card.id}
                     className="portal-card"
-                    onClick={() => navigate(card.path)}
+                    onClick={() => handleCardClick(card)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        navigate(card.path);
+                        handleCardClick(card);
                       }
                     }}
                   >
