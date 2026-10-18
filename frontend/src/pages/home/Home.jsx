@@ -16,11 +16,7 @@ import {
   ChevronRight,
   ExternalLink,
   UserCircle,
-  LogOut,
-  Tag,
-  Hash,
-  X,
-  Search
+  LogOut
 } from "lucide-react";
 import "./Home.css";
 import { useAuth } from "../../context/AuthContext";
@@ -31,7 +27,7 @@ const PORTAL_CARDS = [
     title: "Course Catalog",
     description: "Browse and enroll in academic semester modules, syllabi, and learning guides.",
     icon: BookOpen,
-    badge: "8 Courses",
+    badge: "Semester 2",
     path: "/login",
   },
   {
@@ -92,96 +88,25 @@ const PORTAL_CARDS = [
   },
 ];
 
-const COURSES = [
-  {
-    id: 1,
-    shortName: "ENG2222",
-    name: "English IV",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 2,
-    shortName: "ICT2213",
-    name: "Operating System Concepts & Applications",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 3,
-    shortName: "ICT2223",
-    name: "Internet of Things",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 4,
-    shortName: "ICT2232",
-    name: "Software Engineering",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 5,
-    shortName: "ICT2242",
-    name: "Management Information Systems",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 6,
-    shortName: "ICT2252",
-    name: "Wireless Communications",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 7,
-    shortName: "TCS2212",
-    name: "Accounting for Technologists",
-    category: "2024/2025 Semester II",
-  },
-  {
-    id: 8,
-    shortName: "TMS2213_ICT",
-    name: "Probability and Statistics",
-    category: "2024/2025 Semester II",
-  },
-];
-
 const Home = () => {
   const navigate = useNavigate();
 
   const { user, logout } = useAuth();
 const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-const [courseModalOpen, setCourseModalOpen] = useState(false);
-const [courseSearch, setCourseSearch] = useState("");
 
-const [activeFilter, setActiveFilter] = useState("All");
-const [notices, setNotices] = useState([]);
-const [loadingNotices, setLoadingNotices] = useState(true);
-const [noticeError, setNoticeError] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [notices, setNotices] = useState([]);
+  const [loadingNotices, setLoadingNotices] = useState(true);
+  const [noticeError, setNoticeError] = useState("");
 
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape") {
-      setCourseModalOpen(false);
+  const handleCardClick = (card) => {
+    if (card.id === "courses") {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+      window.location.href = `${apiBase}/courses`;
+      return;
     }
+    navigate(card.path);
   };
-  if (courseModalOpen) {
-    window.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "unset";
-  }
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "unset";
-  };
-}, [courseModalOpen]);
-
-const filteredCourses = COURSES.filter((course) => {
-  const query = courseSearch.toLowerCase();
-  return (
-    course.shortName.toLowerCase().includes(query) ||
-    course.name.toLowerCase().includes(query) ||
-    course.category.toLowerCase().includes(query)
-  );
-});
 
 useEffect(() => {
   const fetchNotices = async () => {
@@ -362,27 +287,16 @@ const formatNoticeDate = (date) => {
             <div className="cards-grid">
               {PORTAL_CARDS.map((card) => {
                 const IconComponent = card.icon;
-                const isCourseCard = card.id === "courses";
                 return (
                   <div
                     key={card.id}
-                    className={`portal-card ${isCourseCard ? "portal-card-courses" : ""}`}
-                    onClick={() => {
-                      if (isCourseCard) {
-                        setCourseModalOpen(true);
-                      } else {
-                        navigate(card.path);
-                      }
-                    }}
+                    className="portal-card"
+                    onClick={() => handleCardClick(card)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        if (isCourseCard) {
-                          setCourseModalOpen(true);
-                        } else {
-                          navigate(card.path);
-                        }
+                        handleCardClick(card);
                       }
                     }}
                   >
@@ -397,20 +311,12 @@ const formatNoticeDate = (date) => {
                       <div className="card-content">
                         <h3 className="card-title">{card.title}</h3>
                         <p className="card-description">{card.description}</p>
-                        {isCourseCard && (
-                          <div className="card-course-preview">
-                            <span className="course-pill-mini">ENG2222</span>
-                            <span className="course-pill-mini">ICT2213</span>
-                            <span className="course-pill-mini">ICT2223</span>
-                            <span className="course-pill-mini more">+{COURSES.length - 3}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
                     <div className="card-meta">
                       <span className="card-badge">{card.badge}</span>
-                      <span>{isCourseCard ? "View Catalog" : "Access Portal"}</span>
+                      <span>Access Portal</span>
                     </div>
                   </div>
                 );
@@ -491,145 +397,6 @@ const formatNoticeDate = (date) => {
           </aside>
         </div>
       </main>
-
-      {/* Course Catalog Modal (accessed from Course Catalog Card) */}
-      {courseModalOpen && (
-        <div
-          className="course-modal-backdrop"
-          onClick={() => setCourseModalOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Course Catalog Modal"
-        >
-          <div
-            className="course-modal-container"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="course-modal-header">
-              <div className="course-catalog-title-group">
-                <div className="course-catalog-icon-badge">
-                  <BookOpen size={20} />
-                </div>
-                <div>
-                  <h3 className="course-catalog-heading">Course Catalog</h3>
-                  <p className="course-catalog-subheading">
-                    2024/2025 Semester II — Enrolled Academic Modules
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="course-modal-close-btn"
-                aria-label="Close modal"
-                onClick={() => setCourseModalOpen(false)}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="course-modal-toolbar">
-              <div className="course-search-box">
-                <Search size={16} className="course-search-icon" />
-                <input
-                  type="text"
-                  className="course-search-input"
-                  placeholder="Search by module code or name (e.g. ICT, English)..."
-                  value={courseSearch}
-                  onChange={(e) => setCourseSearch(e.target.value)}
-                  autoFocus
-                />
-                {courseSearch && (
-                  <button
-                    type="button"
-                    className="course-search-clear"
-                    onClick={() => setCourseSearch("")}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <span className="course-catalog-count-badge">
-                {filteredCourses.length} {filteredCourses.length === 1 ? "Course" : "Courses"}
-              </span>
-            </div>
-
-            <div className="course-modal-content">
-              {filteredCourses.length === 0 ? (
-                <div className="course-modal-empty">
-                  <p>No modules found matching "{courseSearch}".</p>
-                  <button
-                    type="button"
-                    className="modal-reset-btn"
-                    onClick={() => setCourseSearch("")}
-                  >
-                    Reset Search
-                  </button>
-                </div>
-              ) : (
-                <div className="course-catalog-grid">
-                  {filteredCourses.map((course) => (
-                    <div
-                      key={course.id}
-                      className="course-card"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        setCourseModalOpen(false);
-                        navigate("/login");
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          setCourseModalOpen(false);
-                          navigate("/login");
-                        }
-                      }}
-                    >
-                      <div className="course-card-top">
-                        <span className="course-code-badge">
-                          <Hash size={11} />
-                          {course.shortName}
-                        </span>
-                        <ChevronRight size={16} className="course-card-arrow" />
-                      </div>
-                      <h4 className="course-card-name">{course.name}</h4>
-                      <div className="course-card-footer">
-                        <Tag size={11} />
-                        <span>{course.category}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="course-modal-footer">
-              <span className="modal-footer-hint">
-                Select any module to sign in and view syllabus, materials, and discussions.
-              </span>
-              <div className="modal-footer-actions">
-                <button
-                  type="button"
-                  className="modal-btn-close"
-                  onClick={() => setCourseModalOpen(false)}
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="modal-btn-signin"
-                  onClick={() => {
-                    setCourseModalOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Student Sign In
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="home-footer">

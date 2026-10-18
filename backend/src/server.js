@@ -11,6 +11,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import noticeRoutes from "./routes/noticeRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/courses", courseRoutes);
 
 //connect to MongoDB
 mongoose

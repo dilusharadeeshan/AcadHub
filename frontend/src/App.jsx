@@ -7,6 +7,7 @@ import Register from "./pages/auth/Register";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import StudentDashboard from "./pages/dashboard/Dashboard";
 import AllNotices from "./pages/notices/AllNotices";
+import CourseCatalog from "./pages/courses/CourseCatalog";
 
 
 function App() {
@@ -39,6 +40,9 @@ function App() {
           
         <Route path="/register" element={<Register />} />
         <Route path="/notices" element={<AllNotices />} />
+        <Route path="/courses" element={<CourseCatalog />} />
+        <Route path="/course-catalog" element={<CourseCatalog />} />
+        <Route path="/catalog" element={<CourseCatalog />} />
       </Routes>
     </BrowserRouter>
         </AuthProvider>
