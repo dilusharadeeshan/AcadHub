@@ -7,7 +7,6 @@ import {
   BookOpen,
   Search,
   Sparkles,
-  Layers,
   Tag,
   Hash,
   UserCircle,
@@ -102,45 +101,26 @@ export const COURSES = [
   },
 ];
 
-const CATEGORY_TABS = ["All", "ICT / Tech", "Mathematics", "Management", "Languages"];
-
 const CourseCatalog = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("All");
-
-  const totalCredits = useMemo(() => {
-    return COURSES.reduce((sum, c) => sum + (c.credits || 0), 0);
-  }, []);
 
   const filteredCourses = useMemo(() => {
     const term = search.trim().toLowerCase();
 
     return COURSES.filter((course) => {
-      const matchesSearch =
+      return (
         !term ||
         course.shortName.toLowerCase().includes(term) ||
         course.name.toLowerCase().includes(term) ||
         course.category.toLowerCase().includes(term) ||
-        course.department.toLowerCase().includes(term);
-
-      let matchesTab = true;
-      if (activeTab === "ICT / Tech") {
-        matchesTab = course.shortName.startsWith("ICT");
-      } else if (activeTab === "Mathematics") {
-        matchesTab = course.shortName.startsWith("TMS");
-      } else if (activeTab === "Management") {
-        matchesTab = course.shortName.startsWith("TCS") || course.shortName.includes("2242");
-      } else if (activeTab === "Languages") {
-        matchesTab = course.shortName.startsWith("ENG");
-      }
-
-      return matchesSearch && matchesTab;
+        course.department.toLowerCase().includes(term)
+      );
     });
-  }, [search, activeTab]);
+  }, [search]);
 
   const handleAccessModule = (course) => {
     if (!user) {
@@ -283,34 +263,11 @@ const CourseCatalog = () => {
                 <span className="catalog-stat-label">2024/2025 Semester II</span>
               </div>
             </div>
-
-            <div className="catalog-stat-card">
-              <div className="catalog-stat-icon">
-                <Layers size={18} />
-              </div>
-              <div className="catalog-stat-info">
-                <span className="catalog-stat-number">{totalCredits} Credits</span>
-                <span className="catalog-stat-label">Total Workload</span>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Search & Filter Toolbar */}
+        {/* Search Toolbar */}
         <div className="catalog-toolbar">
-          <div className="catalog-filter-bar">
-            {CATEGORY_TABS.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                className={`filter-tab ${activeTab === tab ? "active" : ""}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           <div className="catalog-search-box">
             <Search size={16} />
             <input
@@ -340,12 +297,9 @@ const CourseCatalog = () => {
               <button
                 type="button"
                 className="catalog-reset-btn"
-                onClick={() => {
-                  setSearch("");
-                  setActiveTab("All");
-                }}
+                onClick={() => setSearch("")}
               >
-                Reset Filters
+                Reset Search
               </button>
             </div>
           ) : (
